@@ -1,3 +1,11 @@
+<<<<<<< HEAD
 .env
 node_modules/
 **/.DS_Store
+=======
+# Object file
+*.o
+
+# Ada Library Information
+*.ali
+>>>>>>> e7cfeb08fc2cb798a564ff73035d1e17b715ce7d
