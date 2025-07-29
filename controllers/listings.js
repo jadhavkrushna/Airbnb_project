@@ -1,5 +1,5 @@
 const Listing = require("../models/listing");
-const mbxGeocoding = require('@mapbox/mapbox-sdk/services/geocoding');
+// const mbxGeocoding = require('@mapbox/mapbox-sdk/services/geocoding');
 const mapToken = process.env.MAP_TOKEN;
 // const geocodingClient = mbxGeocoding({ accessToken: mapToken });
 
@@ -26,7 +26,7 @@ const listing = await Listing.findById(id)
   .populate("owner");
     if (!listing) {
       req.flash("error", "Listing does not Exist");
-      return res.redirect("/listings"); // <-- Add return here
+      return res.redirect("/listings");
     } 
     console.log(listing);
     res.render("listings/show.ejs", { listing });
@@ -74,7 +74,7 @@ module.exports.renderEditForm = async (req, res, next) => {
   module.exports.destroyListing = async (req, res) => {
     let { id } = req.params;
     let deletedListing = await Listing.findByIdAndDelete(id);
-    console.log(deletedListing);
+    // console.log(deletedListing);
     req.flash("success","Listing Deleted!!!")
     res.redirect("/listings");
     

@@ -1,0 +1,115 @@
+<% layout('/layouts/boilerplate') %>
+
+<style>
+  .order-container {
+    padding: 2rem;
+    font-family: 'Segoe UI', sans-serif;
+  }
+  .order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .order-card {
+    display: flex;
+    justify-content: space-between;
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 2rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    margin-top: 1.5rem;
+  }
+  .product-info {
+    display: flex;
+    gap: 1.5rem;
+    flex: 1;
+  }
+  .product-info img {
+    height: 120px;
+    width: 120px;
+    border-radius: 8px;
+    object-fit: cover;
+  }
+  .product-details {
+    font-size: 0.95rem;
+    color: #4a4a4a;
+  }
+  .product-details h5 {
+    margin: 0 0 0.5rem 0;
+  }
+  .address-info {
+    font-size: 0.9rem;
+    color: #4a4a4a;
+    width: 250px;
+  }
+  .status-bar {
+    margin-top: 2rem;
+  }
+  .progress-line {
+    height: 6px;
+    background: #e5e5e5;
+    border-radius: 3px;
+    position: relative;
+  }
+  .progress-line::before {
+    content: '';
+    position: absolute;
+    height: 6px;
+    background: #6366f1;
+    width: 50%; /* Adjust this to match order progress */
+    border-radius: 3px;
+  }
+  .steps {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    color: #6b7280;
+  }
+  .steps span.active {
+    color: #6366f1;
+    font-weight: 600;
+  }
+</style>
+
+<div class="order-container">
+  <div class="order-header">
+    <h2>Order #<%= order.id %></h2>
+    <a href="#" style="color: #6366f1; font-weight: 500;">View invoice →</a>
+  </div>
+  <p style="color: gray;">Order placed <%= order.placedDate %></p>
+
+  <div class="order-card">
+    <div class="product-info">
+      <img src="<%= order.product.image %>" alt="product">
+      <div class="product-details">
+        <h5><%= order.product.name %></h5>
+        <p>$<%= order.product.price %></p>
+        <p><%= order.product.description %></p>
+      </div>
+    </div>
+    <div class="address-info">
+      <p><strong>Deliv`ery address</strong></p>
+      <p><%= order.customer.name %><br>
+        <%= order.customer.address %><br>
+        <%= order.customer.city %>, <%= order.customer.postal %>
+      </p>
+      <br>
+      <p><strong>Shipping updates</strong></p>
+      <p><%= order.customer.emailHidden %><br>
+         <%= order.customer.phoneHidden %></p>
+      <a href="#" style="color: #6366f1;">Edit</a>
+    </div>
+  </div>
+
+  <div class="status-bar">
+    <p style="margin-bottom: 0.5rem; font-weight: 500;">Preparing to ship on <%= order.shipDate %></p>
+    <div class="progress-line"></div>
+    <div class="steps">
+      <span class="active">Order placed</span>
+      <span class="active">Processing</span>
+      <span>Shipped</span>
+      <span>Delivered</span>
+    </div>
+  </div>
+</div>

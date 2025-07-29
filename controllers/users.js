@@ -3,7 +3,7 @@ const User = require("../models/user");
 
 //renderSignupForm
 module.exports.renderSignupForm = (req,res) =>{
-    res.render("/users/signup.ejs");
+    res.render("users/signup.ejs");
 };
 
 //signup
@@ -28,7 +28,7 @@ module.exports.signup = async(req,res) =>{
 
 //renderLoginForm
 module.exports.renderLoginForm =  (req, res) =>{
-    res.render("/users/login.ejs");
+    res.render("users/login.ejs");
 };
 
 
