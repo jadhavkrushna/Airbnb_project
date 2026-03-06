@@ -1,107 +1,265 @@
-body{
-  font-family: "Plus Jakarta Sans", sans-serif!important;
-display: flex;
-flex-direction: column;
-min-height: 100vh;
-
+:root {
+    --airbnb-red: #FF385C;
+    --text-dark: #222222;
+    --text-gray: #717171;
+    --bg-light: #F7F7F7;
+    --border-light: #DDDDDD;
 }
-.container{
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+body {
+    font-family: Circular, -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif !important;
+    color: var(--text-dark);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.container {
     flex: 1;
 }
+
 .navbar {
     height: 5rem;
-    background-color: aliceblue ;
+    background-color: white !important;
+    border-bottom: 1px solid var(--border-light);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    z-index: 1050;
+    /* Ensure navigation is always on top */
 }
-.fa-airbnb{
-    color: #fe424d;
-    font-size: 2rem;
+
+.fa-airbnb {
+    color: var(--airbnb-red);
+    font-size: 2.2rem;
 }
-.nav-link{
-    color: #222222 !important;
+
+.nav-link {
+    color: var(--text-dark) !important;
+    font-weight: 500;
+    padding: 0.5rem 1rem !important;
+    border-radius: 2rem;
+    transition: background-color 0.25s ease;
 }
+
+.nav-link:hover {
+    background-color: var(--bg-light);
+}
+
 /*  Footer */
 .f-info-links a {
     text-decoration: none;
-    color: #222222;
+    color: var(--text-dark);
 }
 
 .f-info-links a:hover {
     text-decoration: underline;
 }
 
-.f-info-links{
+.f-info-links {
     width: 100%;
     text-align: center;
 }
 
-.f-info-socials{
+.f-info-socials {
     width: 100%;
     font-size: 1.2rem;
     margin-right: 2rem;
-    text-align: center  ;
+    text-align: center;
 }
 
 .f-info {
-    height: 8rem;
-    background: #ebebeb;
+    height: 6rem;
+    background: var(--bg-light);
+    border-top: 1px solid var(--border-light);
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    align-items: center; /* corrected */
+    align-items: center;
 }
+
 /* .cards */
-.listing-card  { 
-    border:none !important ;
-    border-radius: 2rem;
+.listing-card {
+    border: none !important;
+    margin-bottom: 2rem;
+    background: transparent !important;
 }
-.card-img-top{
+
+.listing-card:hover {
+    cursor: pointer;
+}
+
+.card-img-top {
     border-radius: 1rem !important;
-    width:100% !important;
-    object-fit:cover;
+    width: 100% !important;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
 }
-.card-body{
-    padding: 0 !important;
+
+.card-body {
+    padding: 0.5rem 0 0 0 !important;
 }
-.card-text p{
+
+.card-text {
+    margin-bottom: 0.2rem !important;
+}
+
+.card-text p {
     font-weight: 400 !important;
+    color: var(--text-muted);
 }
-.listing-link{
+
+.card-title {
+    font-weight: 600 !important;
+    font-size: 1rem;
+    color: var(--text-dark);
+    margin-bottom: 0.2rem !important;
+}
+
+.listing-link {
     text-decoration: none;
+    color: inherit;
 }
-.card-img-overlay{
-    opacity: 0;
-}
-.card-img-overlay:hover{
-    opacity: 0.3;
-    background: #ede7e7;
-}
-/* new page */
-.add-btn{
-    background-color: #fe424d !important;
+
+/* new page & edit page */
+.add-btn,
+.edit-btn {
+    background-color: var(--airbnb-red) !important;
     border: none !important;
+    color: white !important;
+    border-radius: 0.5rem;
+    padding: 0.8rem 1.5rem;
+    font-weight: 500;
+    transition: background-color 0.2s;
 }
 
-/* //edit page */
-.edit-btn{
-    background-color: #fe424d !important;
+.add-btn:hover,
+.edit-btn:hover {
+    background-color: #E00B41 !important;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .search-pill {
+        width: 100%;
+        margin: 0.5rem 0;
+    }
+
+    .search-inp {
+        width: 100%;
+    }
+
+    .navbar {
+        height: auto;
+        padding: 0.5rem 0;
+    }
+
+    .f-info {
+        height: auto;
+        padding: 1rem 0;
+    }
+}
+
+@media (max-width: 576px) {
+    .card-img-top {
+        aspect-ratio: 4 / 3;
+    }
+}
+
+/* Heart Overlay & Wishlist */
+.like-icon {
+    background: transparent !important;
     border: none !important;
+    cursor: pointer;
+    -webkit-text-stroke: 1px white;
+    z-index: 5;
+    transition: transform 0.2s ease, color 0.2s;
 }
 
-/* //show page */
-
-.show-img{
-    height: 30vh; 
-}
-.btns{
-    display: flex;
+.like-icon:hover {
+    transform: scale(1.1);
 }
 
-.show-card{
-    padding-left: 0;
-    padding-right: 0;
+.wishlisted {
+    color: #FF385C !important;
 }
-  /* map */
-/* #map {
-    height: 400px;
-    width: 80vh;
-  } */
+
+.not-wishlisted {
+    color: rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Conversation / Message Lists */
+.active-conv {
+    background-color: #f7f7f7 !important;
+    border-left: 4px solid var(--airbnb-red) !important;
+}
+
+/* Footer Styling */
+.hover-underline:hover {
+    text-decoration: underline !important;
+}
+
+.fa-brands {
+    transition: transform 0.2s, opacity 0.2s;
+}
+
+.fa-brands:hover {
+    transform: scale(1.1);
+    opacity: 0.8;
+}
+
+
+/* Flatpickr Airbnb Customization */
+.flatpickr-calendar {
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12) !important;
+    border: 1px solid var(--border-light) !important;
+    padding: 10px !important;
+    border-radius: 1rem !important;
+}
+
+.flatpickr-day.selected,
+.flatpickr-day.startRange,
+.flatpickr-day.endRange {
+    background: var(--text-dark) !important;
+    border-color: var(--text-dark) !important;
+    color: white !important;
+    border-radius: 50% !important;
+}
+
+.flatpickr-day.inRange {
+    background: #f1f1f1 !important;
+    border-color: #f1f1f1 !important;
+    box-shadow: -5px 0 0 #f1f1f1, 5px 0 0 #f1f1f1 !important;
+}
+
+.flatpickr-day:hover {
+    background: var(--bg-light) !important;
+    border-color: var(--bg-light) !important;
+}
+
+.flatpickr-months .flatpickr-month {
+    color: var(--text-dark) !important;
+    fill: var(--text-dark) !important;
+}
+
+.flatpickr-current-month .flatpickr-monthText {
+    font-weight: 600 !important;
+}
+
+#checkin,
+#checkout {
+    cursor: pointer;
+    background-color: transparent;
+}
+
+#checkin:focus,
+#checkout:focus {
+    box-shadow: none;
+}

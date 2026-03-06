@@ -1,95 +1,180 @@
 const Listing = require("../models/listing");
-// const mbxGeocoding = require('@mapbox/mapbox-sdk/services/geocoding');
+const ExpressError = require("../utils/ExpressError");
+const mbxGeocoding = require("@mapbox/mapbox-sdk/services/geocoding");
+
 const mapToken = process.env.MAP_TOKEN;
-// const geocodingClient = mbxGeocoding({ accessToken: mapToken });
 
+const listingController = {
+  // Get all listings
+  index: async (req, res) => {
+    const allListings = await Listing.find({})
+      .populate("owner", "email")
+      .sort({ createdAt: -1 });
+    res.render("listings/index", { allListings });
+  },
 
-//index listing
-module.exports.index = async (req, res) => {
-  const allListings = await Listing.find({});
-  res.render("listings/index.ejs", { allListings });
-};
+  // Render new listing form
+  renderNewForm: (req, res) => {
+    res.render("listings/new");
+  },
 
-//new form listing
-module.exports.renderNewForm = (req, res) => {
-    return res.render("listings/new.ejs");
-};
+  // Show individual listing
+  showListing: async (req, res) => {
+    const { id } = req.params;
 
-//showListing
-module.exports.showListing= async (req, res, next) => {
-    let { id } = req.params;
-const listing = await Listing.findById(id)
-  .populate({
-    path: "reviews",
-    populate: { path: "author" }
-  })
-  .populate("owner");
+    const listing = await Listing.findById(id)
+      .populate({
+        path: "reviews",
+        populate: { path: "author", select: "email" },
+        options: { sort: { createdAt: -1 } },
+      })
+      .populate("owner", "email");
+
     if (!listing) {
-      req.flash("error", "Listing does not Exist");
+      req.flash("error", "Listing you requested does not exist!");
       return res.redirect("/listings");
-    } 
-    console.log(listing);
-    res.render("listings/show.ejs", { listing });
-  };
-
-  //createListing
-  module.exports.createListing =  async (req, res) => {
-  //  let response = await geocodingClient
-  //     .forwardGeocode({
-  //       query: req.body.listing.location,
-  //       limit: 1
-  //     })
-  //     .send();
-
-    let url = req.file.path;
-    let filename = req.file.filename;
-    const newListing = new Listing(req.body.listing);
-    newListing.owner = req.user._id;
-    newListing.image = { url, filename};
-    // newListing.geometry = req.body.listing.geomery[0].location;
-    await newListing.save();
-    req.flash("success","New Listing Created!");
-    res.redirect("/listings");
-  };
-
-  //renderEditForm
-module.exports.renderEditForm = async (req, res, next) => {
-    let { id } = req.params;
-    const listing = await Listing.findById(id);
-    if (!listing) {
-        throw new ExpressError("Listing not found", 404);
     }
 
-    // Only try to modify the image URL if it exists
-    let originalImageUrl = listing.image;
-    if (originalImageUrl && typeof originalImageUrl === "string") {
-       originalImageUrl = originalImageUrl.replace("/upload", "/upload/w_250");
-    } else if (originalImageUrl && originalImageUrl.url) {
-        originalImageUrl = originalImageUrl.url.replace("/upload", "/upload/w_250");
+    res.render("listings/show", { listing, mapToken });
+  },
+
+  // Create new listing
+  createListing: async (req, res) => {
+    const { listing } = req.body;
+
+    // Geocode the location
+    let geoData = null;
+    try {
+      if (mapToken) {
+        const geocodingClient = mbxGeocoding({ accessToken: mapToken });
+        geoData = await geocodingClient
+          .forwardGeocode({
+            query: listing.location,
+            limit: 1,
+          })
+          .send();
+      }
+    } catch (err) {
+      console.log("Geocoding error:", err.message);
+    }
+
+    if (!geoData || !geoData.body || !geoData.body.features || !geoData.body.features.length) {
+      console.log("Location not found or Geocoding disabled. Using default geometry.");
+    }
+
+    const newListing = new Listing(listing);
+    newListing.owner = req.user._id;
+
+    if (req.file) {
+      newListing.image = {
+        url: req.file.path,
+        filename: req.file.filename,
+      };
+    }
+
+    if (geoData && geoData.body && geoData.body.features && geoData.body.features.length) {
+      newListing.geometry = geoData.body.features[0].geometry;
+    } else {
+      newListing.geometry = {
+        type: "Point",
+        coordinates: [0, 0] // Default fallback coordinates
+      };
+    }
+
+    await newListing.save();
+    req.flash("success", "New listing created successfully!");
+    res.redirect(`/listings/${newListing._id}`);
+  },
+
+  // Render edit form
+  renderEditForm: async (req, res) => {
+    const { id } = req.params;
+    const listing = await Listing.findById(id);
+
+    if (!listing) {
+      req.flash("error", "Listing you requested does not exist!");
+      return res.redirect("/listings");
+    }
+
+    let originalImageUrl = listing.image.url;
+    if (originalImageUrl) {
+      originalImageUrl = originalImageUrl.replace("/upload", "/upload/w_250");
     }
 
     res.render("listings/edit", { listing, originalImageUrl });
-};
-   //destroyListing
-  module.exports.destroyListing = async (req, res) => {
-    let { id } = req.params;
-    let deletedListing = await Listing.findByIdAndDelete(id);
-    // console.log(deletedListing);
-    req.flash("success","Listing Deleted!!!")
-    res.redirect("/listings");
-    
-  }
+  },
 
-  //update  
-  module.exports.updateListing = async (req, res) => {
-    let { id } = req.params;
-   let listing =  await Listing.findByIdAndUpdate(id, {...req.body.listing});
-   if( typeof req.file !== "undefined"){
-    let url = req.file.path;
-    let filename = req.file.filename;
-    listing.image = { url, filename };
-    await listing.save();
+  // Update listing
+  updateListing: async (req, res) => {
+    const { id } = req.params;
+    const { listing } = req.body;
+
+    // Optional: Only re-geocode if location changed or geometry is missing
+    let geoData = null;
+    try {
+      if (mapToken) {
+        const geocodingClient = mbxGeocoding({ accessToken: mapToken });
+        geoData = await geocodingClient
+          .forwardGeocode({
+            query: listing.location,
+            limit: 1,
+          })
+          .send();
+      }
+    } catch (err) {
+      console.log("Geocoding update error:", err.message);
     }
-    req.flash("success","Listing Updated Successfully");
+
+    const updatedListing = await Listing.findByIdAndUpdate(id, listing, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (geoData && geoData.body && geoData.body.features && geoData.body.features.length) {
+      updatedListing.geometry = geoData.body.features[0].geometry;
+    }
+
+    if (req.file) {
+      updatedListing.image = {
+        url: req.file.path,
+        filename: req.file.filename,
+      };
+    }
+
+    await updatedListing.save();
+
+    req.flash("success", "Listing updated successfully!");
     res.redirect(`/listings/${id}`);
-  };
+  },
+
+  // Delete listing
+  deleteListing: async (req, res) => {
+    const { id } = req.params;
+    await Listing.findByIdAndDelete(id);
+    req.flash("success", "Listing deleted successfully!");
+    res.redirect("/listings");
+  },
+
+  // Search listings
+  searchListings: async (req, res) => {
+    const { q } = req.query;
+
+    if (!q || q.trim() === "") {
+      return res.redirect("/listings");
+    }
+
+    const searchRegex = new RegExp(q, "i");
+    const listings = await Listing.find({
+      $or: [
+        { title: searchRegex },
+        { location: searchRegex },
+        { country: searchRegex },
+        { description: searchRegex },
+      ],
+    }).populate("owner", "username");
+
+    res.render("listings/search", { listings, query: q });
+  },
+};
+
+module.exports = listingController;

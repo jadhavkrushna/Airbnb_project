@@ -1,48 +1,148 @@
 <style>
-  .search-btn{
-    background-color:  #fe424d;
-    border-radius: 25px;
-    padding: 0 1rem 0 1rem;
+  .navbar {
+    padding: 1rem 0;
   }
-  .search-btn:hover{
-    background-color: #fe424d;
-    color: #fff;
+
+  /* Search Pill */
+  .search-pill {
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--border-light);
+    border-radius: 40px;
+    padding: 0.3rem 0.5rem 0.3rem 1.5rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.05);
+    transition: box-shadow 0.2s ease;
+    background: white;
+    margin: 0 auto;
   }
-  .search-btn i{
-    display: inline;
-    margin-right: 0.5rem;
+
+  .search-pill:hover {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.18);
   }
-  .search-inp{
-    border-radius: 25px;
-    padding: 0.5rem 3rem 0.5rem 3rem;
+
+  .search-inp {
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    font-weight: 500;
+    width: 250px;
+    padding-right: 1rem;
+  }
+
+  .search-inp::placeholder {
+    color: var(--text-dark);
+  }
+
+  .search-btn {
+    background-color: var(--airbnb-red);
+    color: white;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    transition: background-color 0.2s;
+  }
+
+  .search-btn:hover {
+    background-color: #E00B41;
+    color: white;
+  }
+
+  .search-btn i {
     font-size: 1rem;
+    margin: 0;
+  }
+
+  /* User Menu */
+  .user-menu {
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--border-light);
+    border-radius: 30px;
+    padding: 0.4rem 0.6rem 0.4rem 0.8rem;
+    background: white;
+    transition: box-shadow 0.2s;
+    cursor: pointer;
+    gap: 0.6rem;
+  }
+
+  .user-menu:hover {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.18);
+  }
+
+  .user-menu i.fa-bars {
+    font-size: 1rem;
+    color: var(--text-dark);
+  }
+
+  .user-menu i.fa-user-circle {
+    font-size: 1.8rem;
+    color: var(--text-muted);
+  }
+
+  .host-link {
+    font-weight: 500;
+    padding: 0.6rem 1rem;
+    border-radius: 2rem;
+    transition: background-color 0.2s;
+  }
+
+  .host-link:hover {
+    background-color: var(--bg-light);
   }
 </style>
 
+<nav class="navbar navbar-expand-md sticky-top">
+  <div class="container-fluid px-md-5">
+    <a class="navbar-brand" href="/listings">
+      <i class="fa-brands fa-airbnb"></i> <span
+        style="color: var(--airbnb-red); font-weight: 700; font-size: 1.5rem; margin-left: 0.2rem; letter-spacing: -0.5px;"
+        class="d-none d-lg-inline">wanderlust</span>
+    </a>
 
-<nav class="navbar navbar-expand-md sticky-top bg-body-light">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="/listings"><i class="fa-brands fa-airbnb"></i></a>
-    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-      <div class="navbar-nav">
-       <a class="nav-link" href="/listings">Explore</a>
+    <div class="collapse navbar-collapse d-flex justify-content-between" id="navbarNavAltMarkup">
+      <div class="navbar-nav mx-auto">
+        <form class="search-pill" role="search" action="/listings/search" method="GET">
+          <input class="form-control me-2 search-inp" type="search" placeholder="Start your search" aria-label="Search"
+            name="q" id="search-input" />
+          <button class="btn search-btn" type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
+        </form>
       </div>
-      <div class="navbar-nav ms-auto">
-        <input class="form-control me-2 search-inp" type="search" placeholder="Search" aria-label="Search"/>
-        <form class="d-flex" role="search">
-        <button class="btn search-btn" type="submit">Search</button>
-    </form>
-        
-      </div>
-      <div class="navbar-nav ms-auto">
-         <a class="nav-link" href="/listings/new">Become a host</a>
-        <% if (!currUser) {%>
-        <a class="nav-link" href="/signup"><b>Sign Up</b></a>
-        <a class="nav-link" href="/login"><b>Log in</b></a>
-        <% } %>
-         <% if (currUser) {%>
-        <a class="nav-link" href="/logout"><b>Log Out</b> </a>
-        <% } %> 
+
+      <div class="navbar-nav ms-auto align-items-center">
+        <a class="nav-link host-link d-none d-md-block" href="/listings/new">Airbnb your home</a>
+
+        <div class="dropdown ms-2">
+          <div class="user-menu" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <img
+              src="<%= currUser ? currUser.profileImage.url : 'https://res.cloudinary.com/demo/image/upload/d_avatar.png/personal_avatar.png' %>"
+              alt="user_avatar" class="rounded-circle" style="width: 32px; height: 32px; object-fit: cover;">
+          </div>
+          <ul class="dropdown-menu dropdown-menu-end shadow border-0"
+            style="border-radius: 12px; margin-top: 0.8rem; padding: 0.5rem 0; width: 240px;">
+            <% if (!currUser) {%>
+              <li><a class="dropdown-item fw-bold" href="/signup">Sign up</a></li>
+              <li><a class="dropdown-item" href="/login">Log in</a></li>
+              <li>
+                <hr class="dropdown-divider">
+              </li>
+              <li><a class="dropdown-item" href="/listings/new">Airbnb your home</a></li>
+              <li><a class="dropdown-item" href="#">Help</a></li>
+              <% } else { %>
+                <li><a class="dropdown-item fw-bold" href="/profile">Profile</a></li>
+                <li><a class="dropdown-item fw-bold" href="/messages">Messages</a></li>
+                <li><a class="dropdown-item fw-bold" href="/saved">Saved</a></li>
+                <li>
+                  <hr class="dropdown-divider">
+                </li>
+                <li><a class="dropdown-item" href="/listings/new">Airbnb your home</a></li>
+                <li><a class="dropdown-item" href="/logout">Log out</a></li>
+                <% } %>
+          </ul>
+        </div>
       </div>
     </div>
   </div>

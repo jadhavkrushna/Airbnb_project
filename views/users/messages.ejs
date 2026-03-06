@@ -1,0 +1,146 @@
+<% layout("/layouts/boilerplate") %>
+
+    <div class="row mt-4 mb-3 px-md-5 mx-auto" style="max-width: 1200px;">
+        <div class="col-12">
+            <h2 class="mb-4 fw-bold">Messages</h2>
+        </div>
+    </div>
+
+    <div class="row px-md-5 mx-auto mb-5" style="max-width: 1200px;">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden" style="min-height: 600px;">
+                <div class="row g-0 h-100" style="min-height: 600px;">
+                    <!-- Sidebar -->
+                    <div class="col-12 col-md-4 border-end bg-white overflow-auto" style="max-height: 600px;">
+                        <div class="p-3 border-bottom d-flex justify-content-between align-items-center bg-light">
+                            <span class="fw-bold">All messages (<%= conversations.length %>)</span>
+                        </div>
+
+                        <% if (conversations.length> 0) { %>
+                            <div class="list-group list-group-flush">
+                                <% for(let conv of conversations) { %>
+                                    <% const otherParticipant=conv.participants.find(p=> !p._id.equals(currUser._id));
+                                        const isActive = activeConversation && activeConversation._id.equals(conv._id);
+                                        %>
+                                        <a href="/messages/<%= conv._id %>"
+                                            class="list-group-item list-group-item-action p-3 border-bottom <%= isActive ? 'active-conv' : '' %>">
+                                            <div class="d-flex align-items-center">
+                                                <div class="flex-shrink-0">
+                                                    <i class="fa-solid fa-user-circle fs-2 text-muted"></i>
+                                                </div>
+                                                <div class="flex-grow-1 ms-3 overflow-hidden">
+                                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                                        <h6 class="mb-0 fw-bold">
+                                                            <%= otherParticipant ? (otherParticipant.firstName ||
+                                                                otherParticipant.email.split('@')[0])
+                                                                : 'Wanderlust User' %>
+                                                        </h6>
+                                                        <small class="text-muted">
+                                                            <%= conv.updatedAt.toLocaleDateString() %>
+                                                        </small>
+                                                    </div>
+                                                    <p class="text-muted small mb-0 text-truncate">
+                                                        <%= conv.lastMessage ? conv.lastMessage.content
+                                                            : 'No messages yet' %>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </a>
+                                        <% } %>
+                            </div>
+                            <% } else { %>
+                                <div
+                                    class="d-flex flex-column align-items-center justify-content-center h-100 py-5 text-center px-4">
+                                    <i class="fa-regular fa-comment-dots mb-3 fs-1 text-muted"></i>
+                                    <h6 class="fw-bold">No messages yet</h6>
+                                    <p class="text-muted small">When you receive a message from a host or guest, it will
+                                        appear here.</p>
+                                </div>
+                                <% } %>
+                    </div>
+
+                    <!-- Main Chat Area -->
+                    <div class="col-12 col-md-8 d-flex flex-column bg-white overflow-hidden" style="max-height: 600px;">
+                        <% if (activeConversation) { %>
+                            <div
+                                class="p-3 border-bottom d-flex align-items-center justify-content-between bg-white sticky-top">
+                                <div class="d-flex align-items-center">
+                                    <i class="fa-solid fa-user-circle fs-3 text-muted me-2"></i>
+                                    <div>
+                                        <% const chatPartner=activeConversation.participants.find(p=>
+                                            !p._id.equals(currUser._id)); %>
+                                            <h6 class="mb-0 fw-bold">
+                                                <%= chatPartner ? (chatPartner.firstName ||
+                                                    chatPartner.email.split('@')[0]) : 'User' %>
+                                            </h6>
+                                            <% if (activeConversation.listing) { %>
+                                                <small class="text-muted">Regarding: <%=
+                                                        activeConversation.listing.title %></small>
+                                                <% } %>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex-grow-1 p-4 overflow-auto bg-light d-flex flex-column gap-3"
+                                id="message-container">
+                                <% if (messages && messages.length> 0) { %>
+                                    <% for(let msg of messages) { %>
+                                        <% const isMine=msg.sender.equals(currUser._id); %>
+                                            <div
+                                                class="d-flex <%= isMine ? 'justify-content-end' : 'justify-content-start' %>">
+                                                <div style="max-width: 75%;">
+                                                    <div
+                                                        class="p-3 rounded-4 shadow-sm <%= isMine ? 'bg-dark text-white' : 'bg-white text-dark border' %>">
+                                                        <% if (msg.isAutomated) { %>
+                                                            <span class="badge bg-primary mb-2"
+                                                                style="font-size: 0.6rem;">SYSTEM</span>
+                                                            <% } %>
+                                                                <p class="mb-1" style="font-size: 0.95rem;">
+                                                                    <%= msg.content %>
+                                                                </p>
+                                                                <div class="text-end">
+                                                                    <small
+                                                                        class="<%= isMine ? 'text-white-50' : 'text-muted' %>"
+                                                                        style="font-size: 0.7rem;">
+                                                                        <%= msg.createdAt.toLocaleTimeString([], {
+                                                                            hour: '2-digit' , minute: '2-digit' }) %>
+                                                                    </small>
+                                                                </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <% } %>
+                                                <% } %>
+                            </div>
+
+                            <div class="p-3 border-top bg-white">
+                                <form action="/messages/<%= activeConversation._id %>" method="POST"
+                                    class="d-flex gap-2">
+                                    <input type="text" name="content" class="form-control rounded-pill px-4"
+                                        placeholder="Write a message..." required autocomplete="off">
+                                    <button class="btn btn-dark rounded-circle" type="submit"
+                                        style="width: 45px; height: 45px;">
+                                        <i class="fa-solid fa-paper-plane"></i>
+                                    </button>
+                                </form>
+                            </div>
+                            <% } else { %>
+                                <div
+                                    class="d-flex flex-column align-items-center justify-content-center h-100 bg-light text-center px-5">
+                                    <i class="fa-solid fa-envelope-open-text mb-3"
+                                        style="font-size: 3rem; color: #ddd;"></i>
+                                    <h5 class="fw-bold text-muted">Select a message</h5>
+                                    <p class="text-muted mb-0">Choose a conversation from the list to start chatting.
+                                    </p>
+                                </div>
+                                <% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const container = document.getElementById('message-container');
+        if (container) { container.scrollTop = container.scrollHeight; }
+    </script>

@@ -1,0 +1,34 @@
+<% layout("/layouts/boilerplate") %>
+
+    <div class="container mt-5 mb-5">
+        <div class="row">
+            <div class="col-12 col-md-8 offset-md-2">
+                <h1 class="mb-4 fw-bold">
+                    <%= title %>
+                </h1>
+
+                <div class="card p-5 border-0 shadow-sm text-center"
+                    style="border-radius: 1rem; background-color: var(--bg-light);">
+                    <div class="mb-4">
+                        <% if (title==="Messages" ) { %>
+                            <i class="fa-regular fa-comment-dots"
+                                style="font-size: 4rem; color: var(--text-muted);"></i>
+                            <% } else if (title==="Trips" ) { %>
+                                <i class="fa-solid fa-suitcase" style="font-size: 4rem; color: var(--text-muted);"></i>
+                                <% } else if (title==="Wishlists" ) { %>
+                                    <i class="fa-regular fa-heart"
+                                        style="font-size: 4rem; color: var(--text-muted);"></i>
+                                    <% } %>
+                    </div>
+                    <h4 class="fw-bold mb-3">
+                        <%= message %>
+                    </h4>
+                    <p class="text-muted mb-4">You'll find all the information about your <%= title.toLowerCase() %>
+                            here once you start exploring Wanderlust.</p>
+                    <div>
+                        <a href="/listings" class="btn btn-outline-dark px-4 py-2 fw-bold rounded-3">Start exploring</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>

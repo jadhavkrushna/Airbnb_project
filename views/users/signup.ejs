@@ -1,46 +1,32 @@
 <% layout("/layouts/boilerplate") %>
 
-<div class="row mt-3">
-    <h1 class="col-6 offset-3" >SignUp on WanderLust</h1>
-    <div class="col-6 offset-3">
-
-        <form action="/signup" method="post" novalidate class="needs-validation">
-
-        <div class="mb-3">
-            <label for="username" class="form-label">Username</label>
-            <input
-             name="username"
-             id="username"
-              placeholder="Please enter Username"
-               type="text"
-                class="form-control"
-                 required
-                 />
-            <div class="valid-feedback">looks good!</div>
+    <div class="row mt-5 mb-5">
+        <div class="col-12 col-md-6 col-lg-4 offset-md-3 offset-lg-4">
+            <div class="card shadow-sm border-0" style="border-radius: 1rem; overflow: hidden;">
+                <div class="card-header bg-white text-center py-3 border-bottom">
+                    <h5 class="mb-0 fw-bold">Sign up</h5>
+                </div>
+                <div class="card-body p-4">
+                    <h4 class="mb-4">Welcome to Wanderlust</h4>
+                    <form action="/signup" method="post" novalidate class="needs-validation">
+                        <div class="mb-3">
+                            <input name="username" id="username" placeholder="Username" type="text" class="form-control"
+                                style="border-radius: 0.5rem; padding: 0.8rem 1rem;" required />
+                            <div class="valid-feedback">Looks good!</div>
+                        </div>
+                        <div class="mb-3">
+                            <input name="email" id="email" placeholder="Email address" type="email" class="form-control"
+                                style="border-radius: 0.5rem; padding: 0.8rem 1rem;" required />
+                        </div>
+                        <div class="mb-4">
+                            <input name="password" id="password" placeholder="Password" type="password"
+                                class="form-control" style="border-radius: 0.5rem; padding: 0.8rem 1rem;" required />
+                        </div>
+                        <button class="btn edit-btn w-100 fw-bold py-2 fs-5">Agree and continue</button>
+                        <p class="text-muted small mt-3 text-center">By selecting Agree and continue, I agree to
+                            Wanderlust's Terms of Service.</p>
+                    </form>
+                </div>
+            </div>
         </div>
-            <div class="mb-3">
-            <label for="email" class="form-label">Email</label>
-            <input
-             name="email"
-             id="email"
-              placeholder="Ex. abc@gmail.com"
-               type="email"
-                class="form-control"
-                 required
-                 />
-        </div>
-            <div class="mb-3">
-            <label for="password" class="form-label">Password</label>
-            <input
-             name="password"
-             id="password"
-               type="password"
-                class="form-control"
-                 required
-                 />
-        </div>
-        <button class="btn btn-success">SignUp</button>
-
-        </form>
     </div>
-</div>

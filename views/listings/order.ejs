@@ -1,28 +1,42 @@
-<% layout('/layouts/boilerplate') %>
+<% layout('/layouts/boilerplate') %> <%# --- Data Safety & Dynamic Values --- %>
+<%# Set default values to prevent errors if order data is incomplete %> <% const
+orderData = order || {}; %> <% const product = orderData.product || {}; %> <%
+const customer = orderData.customer || {}; %> <% const status = orderData.status
+|| 'placed'; // Default to 'placed' %> <%# --- Dynamic Progress Logic --- %> <%
+const statuses = ['placed', 'processing', 'shipped', 'delivered']; const
+currentIndex = statuses.indexOf(status); // Calculate progress width: 0%, 33%,
+66%, 100% const progressWidth = currentIndex >= 0 ? (currentIndex /
+(statuses.length - 1)) * 100 : 0; %>
 
 <style>
+  /* Best practice: Move this CSS to a dedicated /public/css/order.css file */
   .order-container {
     padding: 2rem;
-    font-family: 'Segoe UI', sans-serif;
+    font-family: "Segoe UI", sans-serif;
   }
   .order-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap; /* Added for responsiveness */
+    gap: 1rem; /* Added for spacing */
   }
   .order-card {
     display: flex;
     justify-content: space-between;
+    flex-wrap: wrap; /* Added for responsiveness */
     background-color: #fff;
     border-radius: 10px;
     padding: 2rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     margin-top: 1.5rem;
+    gap: 2rem; /* Added for spacing */
   }
   .product-info {
     display: flex;
     gap: 1.5rem;
     flex: 1;
+    min-width: 280px; /* Ensures it doesn't get too squished */
   }
   .product-info img {
     height: 120px;
@@ -52,12 +66,14 @@
     position: relative;
   }
   .progress-line::before {
-    content: '';
+    content: "";
     position: absolute;
     height: 6px;
     background: #6366f1;
-    width: 50%; /* Adjust this to match order progress */
+    /* FIX: Dynamic width based on order status */
+    width: var(--progress-width, 0%);
     border-radius: 3px;
+    transition: width 0.5s ease-in-out;
   }
   .steps {
     display: flex;
@@ -74,42 +90,59 @@
 
 <div class="order-container">
   <div class="order-header">
-    <h2>Order #<%= order.id %></h2>
-    <a href="#" style="color: #6366f1; font-weight: 500;">View invoice →</a>
+    <h2>Order #<%= orderData.id || 'N/A' %></h2>
+    <a href="#" style="color: #6366f1; font-weight: 500">View invoice →</a>
   </div>
-  <p style="color: gray;">Order placed <%= order.placedDate %></p>
+  <p style="color: gray">
+    Order placed <%= orderData.placedDate ? new
+    Date(orderData.placedDate).toLocaleDateString() : 'on an unknown date' %>
+  </p>
 
   <div class="order-card">
     <div class="product-info">
-      <img src="<%= order.product.image %>" alt="product">
+      <%# FIX: Improved accessibility and safety for image %>
+      <img
+        src="<%= product.image || '/images/default-product.png' %>"
+        alt="Product image for <%= product.name || 'an item' %>"
+      />
       <div class="product-details">
-        <h5><%= order.product.name %></h5>
-        <p>$<%= order.product.price %></p>
-        <p><%= order.product.description %></p>
+        <h5><%= product.name || 'Product Name Unavailable' %></h5>
+        <p>$<%= product.price ? product.price.toFixed(2) : '0.00' %></p>
+        <p><%= product.description || 'No description available.' %></p>
       </div>
     </div>
     <div class="address-info">
-      <p><strong>Deliv`ery address</strong></p>
-      <p><%= order.customer.name %><br>
-        <%= order.customer.address %><br>
-        <%= order.customer.city %>, <%= order.customer.postal %>
+      <%# FIX: Corrected typo "Deliv`ery" %>
+      <p><strong>Delivery address</strong></p>
+      <p>
+        <%= customer.name || 'Customer Name' %><br />
+        <%= customer.address || 'Address not provided' %><br />
+        <%= customer.city || 'City' %>, <%= customer.postal || 'Zip' %>
       </p>
-      <br>
+      <br />
       <p><strong>Shipping updates</strong></p>
-      <p><%= order.customer.emailHidden %><br>
-         <%= order.customer.phoneHidden %></p>
-      <a href="#" style="color: #6366f1;">Edit</a>
+      <p>
+        <%= customer.emailHidden || 'Email not provided' %><br />
+        <%= customer.phoneHidden || 'Phone not provided' %>
+      </p>
+      <a href="#" style="color: #6366f1">Edit</a>
     </div>
   </div>
 
   <div class="status-bar">
-    <p style="margin-bottom: 0.5rem; font-weight: 500;">Preparing to ship on <%= order.shipDate %></p>
-    <div class="progress-line"></div>
+    <p style="margin-bottom: 0.5rem; font-weight: 500">
+      <%= status === 'delivered' ? 'Delivered' : `Preparing to ship on
+      ${orderData.shipDate ? new Date(orderData.shipDate).toLocaleDateString() :
+      'a future date'}` %>
+    </p>
+    <div class="progress-line" style="--progress-width: <%= progressWidth %>%"></div>
     <div class="steps">
-      <span class="active">Order placed</span>
-      <span class="active">Processing</span>
-      <span>Shipped</span>
-      <span>Delivered</span>
+      <%# FIX: Dynamic active class for status steps %> <%
+      statuses.forEach((step, index) => { %>
+      <span class="<%= index <= currentIndex ? 'active' : '' %>"
+        ><%= step.charAt(0).toUpperCase() + step.slice(1) %></span
+      >
+      <% }) %>
     </div>
   </div>
 </div>

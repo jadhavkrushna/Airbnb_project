@@ -1,21 +1,30 @@
 const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
 
-const reviewSchema = new Schema({
-    comment: String,
-    rating: {
-        type: Number,
-        min: 1,
-        max: 5,
+const { Schema } = mongoose;
+
+const ReviewSchema = new Schema(
+  {
+    comment: {
+      type: String,
+      required: [true, "Comment is required"],
+      trim: true,
+      maxLength: [500, "Comment cannot exceed 500 characters"],
     },
-    createdAt: {
-        type: Date,
-        default: Date.now(),
+    rating: {
+      type: Number,
+      required: [true, "Rating is required"],
+      min: [1, "Rating must be at least 1"],
+      max: [5, "Rating cannot exceed 5"],
     },
     author: {
-        type: Schema.Types.ObjectId,
-        ref: "User",
-    }
-});
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
 
-module.exports = mongoose.model("Review", reviewSchema);
+module.exports = mongoose.model("Review", ReviewSchema);
