@@ -1,11 +1,26 @@
-<<<<<<< HEAD
+# Secrets and environment variables
 .env
-node_modules/
-**/.DS_Store
-=======
-# Object file
-*.o
+*.env
+secret.js
+secrets.js
+config/secrets.js
 
-# Ada Library Information
-*.ali
->>>>>>> e7cfeb08fc2cb798a564ff73035d1e17b715ce7d
+# Dependencies
+node_modules/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Test coverage
+coverage/
+
+# Build files
+dist/
+build/
