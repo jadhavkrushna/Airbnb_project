@@ -29,7 +29,7 @@ const PORT = process.env.PORT || 8080;
 
 // Database configuration
 const MONGO_URL =
-  process.env.ATLASBD_URL ||
+  process.env.ATLASDB_URL ||
   process.env.MONGO_URL ||
   "mongodb://127.0.0.1:27017/wanderlust";
 
